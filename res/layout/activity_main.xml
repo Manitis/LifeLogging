@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="100" >
+
+    <LinearLayout
+        android:id="@+id/top_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/tvLvlProf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6sp"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:textSize="30sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="100" >
+
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="80"
+                android:src="@drawable/character" >
+            </ImageView>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="20"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/tvCharXP"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+
+                <ProgressBar
+                    android:id="@+id/pbCharXP"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="50"
+                    android:paddingLeft="5sp"
+                    android:paddingRight="5sp"
+                    android:progress="39" />
+
+                <TextView
+                    android:id="@+id/tvCharHP"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3sp"
+                    android:gravity="center"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+
+                <ProgressBar
+                    android:id="@+id/pbCharHP"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="50"
+                    android:paddingLeft="5sp"
+                    android:paddingRight="5sp"
+                    android:progress="26" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/addnewitem_container"
+        android:layout_below="@id/top_container"
+        android:layout_marginTop="10sp"
+        tools:context=".MainActivity"
+        tools:ignore="MergeRootFrame" />
+
+    <RelativeLayout
+        android:id="@+id/addnewitem_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" >
+
+        <Button
+            android:id="@+id/bAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="Add" />
+
+        <EditText
+            android:id="@+id/eNewItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/bAdd"
+            android:layout_alignParentLeft="true"
+            android:layout_alignTop="@id/bAdd"
+            android:layout_toLeftOf="@+id/bAdd"
+            android:hint="@string/add_item" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/bAlert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:visibility="invisible"
+        android:text="Test" />
+
+</RelativeLayout>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/tvXP"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignRight="@+id/npXP"
+                android:gravity="center"
+                android:text="XP reward" />
+
+            <NumberPicker
+                android:id="@+id/npXP"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/tvXP" />
+
+            <NumberPicker
+                android:id="@+id/npHP"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvXP"
+                android:layout_marginLeft="30sp"
+                android:layout_toRightOf="@+id/npXP" />
+
+            <TextView
+                android:id="@+id/tvHP"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/npHP"
+                android:layout_alignLeft="@+id/npHP"
+                android:layout_alignRight="@+id/npHP"
+                android:gravity="center"
+                android:text="HP penalty" />
+
+            <NumberPicker
+                android:id="@+id/npDue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvXP"
+                android:layout_marginLeft="30sp"
+                android:layout_toRightOf="@+id/npHP" />
+
+            <TextView
+                android:id="@+id/tvDue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/npDue"
+                android:layout_alignLeft="@+id/npDue"
+                android:layout_alignRight="@+id/npDue"
+                android:gravity="center"
+                android:text="Due in" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:key="pref_key_notification_settings"
+        android:title="Notification" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_enableNotifications"
+            android:summary="Notify when you have tasks expiring"
+            android:title="Notification" />
+
+        <com.example.habit1.TimePreference
+            android:key="pref_notify_time"
+            android:title="Time to notify" />
+
+        <RingtonePreference
+            android:name="Alarm"
+            android:defaultValue="defaultRingtone"
+            android:key="pref_notif_sound"
+            android:ringtoneType="alarm"
+            android:showDefault="true"
+            android:title="Notification sound" >
+        </RingtonePreference>
+    </PreferenceCategory>
+
+</PreferenceScreen>
