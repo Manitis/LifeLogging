@@ -37,8 +37,81 @@ import de.timroes.swipetodismiss.SwipeDismissList;
 public class MainActivity extends FragmentActivity implements
 		ActionBar.TabListener, OnClickListener {
 
-	private static SwipeDismissList dailySwipeList, habitSwipeList, todoSwipeList;
-	boolean isNotificationEnabled = true;
+	public class PreferenceContainer {
+		int alertHour, alertMinute;
+		int[] alarmTime;
+		SharedPreferences settings;
+		final SharedPreferences.Editor editor;
+		Uri notificationSound, defaultSound;
+		boolean notificationEnabled;
+
+		public PreferenceContainer(){
+			settings = PreferenceManager
+					.getDefaultSharedPreferences(MainActivity.this);
+			editor = settings.edit();
+			defaultSound = Settings.System.DEFAULT_ALARM_ALERT_URI;
+			update();
+		}
+		
+		public void writeUnfinishedValues() {
+			editor.putInt("unfinishedCount", MainActivity.this.getUnfinishedCount());
+			editor.putFloat("xpGainIfFinished", (float) MainActivity.this.xpGainIfFinished());
+			editor.putFloat("hpLossIfUnfinished",
+					(float) MainActivity.this.hpLossIfUnfinished());
+			editor.commit();
+		}
+
+		private void update() {
+			retrieveNotificationSettings();
+		}
+
+		private void retrieveNotificationSettings() {
+			notificationEnabled = settings.getBoolean("notificationsEnabled",
+					true);
+			retrieveNotificationTime();
+			retrieveNotificationSound();
+		}
+
+		private void retrieveNotificationTime() {
+			String alert_time = settings.getString("notificationTime", "19:00");
+			String[] pieces = alert_time.split(":");
+			alertHour = Integer.parseInt(pieces[0]);
+			alertMinute = Integer.parseInt(pieces[1]);
+		}
+
+		private void retrieveNotificationSound() {
+			final String savedUri = settings.getString("notificationSound", "");
+			if (savedUri.length() > 0) {
+				// If the stored string is the bogus string...
+				if (savedUri.equals("defaultRingtone")) {
+					notificationSound = defaultSound;
+					editor.putString("notificationSound", notificationSound.toString());
+					editor.commit();
+				} else {
+					notificationSound = Uri.parse(savedUri);
+				}
+			}
+		}
+		
+		public boolean isNotificationEnabled(){
+			return notificationEnabled;
+		}
+		
+		public int getNotificationHour(){
+			return alertHour;
+		}
+		
+		public int getNotificationMinute(){
+			return alertMinute;
+		}
+		
+		public Uri getNotificationSound(){
+			return notificationSound;
+		}
+	}
+
+	private static SwipeDismissList dailySwipeList, habitSwipeList,
+			todoSwipeList;
 	ActionBar actionBar;
 	TextView tvCharHp, tvCharXp, tvLvlProf;
 	ProgressBar pbCharHp, pbCharXp;
@@ -46,11 +119,6 @@ public class MainActivity extends FragmentActivity implements
 	EditText eAddNewItem;
 	double xp, hp, maxXp, maxHp;
 	int level, unfinished_count;
-	int alert_hour, alert_minute, alert_count;
-	Uri notif_sound = null;
-	int test = 0;
-	int[] pref_alarmTime;
-	SharedPreferences settings;
 	final int SETTINGS_REQUEST_CODE = 1;
 	String[] profession = { "Peasant", "Jester", "Farmer", "Landlord",
 			"Priest", "Magician", "Mayor", "Lord", "Count", "Mayor",
@@ -77,7 +145,7 @@ public class MainActivity extends FragmentActivity implements
 		habitSwipeList.discardUndo();
 		todoSwipeList.discardUndo();
 	}
-	
+
 	private void initialize() {
 		loadPreferences();
 		xp = 0;
@@ -85,7 +153,6 @@ public class MainActivity extends FragmentActivity implements
 		hp = 50;
 		maxHp = 50;
 		level = 1;
-		alert_count = 0;
 		unfinished_count = 0;
 		dailyItems.add(new DailyItem("30 minutes of work out", 8, 4., this));
 		dailyItems.add(new DailyItem("Go to bed before 23", 5, 2, this));
@@ -137,18 +204,17 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	public void startAlert() {
-		Intent intent = new Intent(this, MyBroadcastReceiver.class);
+		Intent intent = new Intent(this, AlarmReceiver.class);
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(
 				this.getApplicationContext(), 234324243, intent, 0);
 		AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.HOUR_OF_DAY, alert_hour);
-		calendar.set(Calendar.MINUTE, alert_minute);
+		calendar.set(Calendar.HOUR_OF_DAY, alertHour);
+		calendar.set(Calendar.MINUTE, alertMinute);
 		calendar.set(Calendar.SECOND, 00);
-		
-		
+
 		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-		calendar.getTimeInMillis(), 24 * 60 * 60 * 1000, pendingIntent);
+				calendar.getTimeInMillis(), 24 * 60 * 60 * 1000, pendingIntent);
 		alarmManager.set(AlarmManager.RTC_WAKEUP,
 				System.currentTimeMillis() + 2 * 1000, pendingIntent);
 	}
@@ -157,15 +223,6 @@ public class MainActivity extends FragmentActivity implements
 		getUnfinishedCount();
 		xpGainIfFinished();
 		hpLossIfUnfinished();
-	}
-
-	public void writeUnfinishedValues() {
-		settings = PreferenceManager.getDefaultSharedPreferences(this);
-		final SharedPreferences.Editor saveEditor = settings.edit();
-		saveEditor.putInt("unfinishedCount", getUnfinishedCount());
-		saveEditor.putFloat("xpGainIfFinished", (float) xpGainIfFinished());
-		saveEditor.putFloat("hpLossIfUnfinished", (float) hpLossIfUnfinished());
-		saveEditor.commit();
 	}
 
 	public List<ActivityItem> getUnfinishedItems() {
@@ -210,40 +267,6 @@ public class MainActivity extends FragmentActivity implements
 		return xpReward;
 	}
 
-	private void loadPreferences() {
-		getNotificationSettings();
-	}
-
-	private void getNotificationSettings() {
-		settings = PreferenceManager.getDefaultSharedPreferences(this);
-		isNotificationEnabled = settings.getBoolean("checkbox_preference",
-				false);
-		getNotificationTime();
-		getNotificationSound();
-	}
-
-	private void getNotificationTime() {
-		String alert_time = settings.getString("pref_notify_time", "19:00");
-		String[] pieces = alert_time.split(":");
-		alert_hour = Integer.parseInt(pieces[0]);
-		alert_minute = Integer.parseInt(pieces[1]);
-	}
-
-	private void getNotificationSound() {
-		final String savedUri = settings.getString("pref_notif_sound", "");
-		if (savedUri.length() > 0) {
-			// If the stored string is the bogus string...
-			if (savedUri.equals("defaultRingtone")) {
-				notif_sound = Settings.System.DEFAULT_ALARM_ALERT_URI;
-				final SharedPreferences.Editor saveEditor = settings.edit();
-				saveEditor.putString("alarm", notif_sound.toString());
-				saveEditor.commit();
-			} else {
-				notif_sound = Uri.parse(savedUri);
-			}
-		}
-	}
-
 	public void updateDisplay() {
 		if (level <= profession.length) {
 			tvLvlProf.setText("Level " + level + " " + profession[level - 1]);
@@ -280,12 +303,11 @@ public class MainActivity extends FragmentActivity implements
 		hp = hp + amount;
 		updateDisplay();
 	}
-	
+
 	public void subtractHp(double amount) {
 		hp = hp - amount;
 		updateDisplay();
 	}
-
 
 	@Override
 	public void onClick(View v) {
@@ -606,17 +628,16 @@ public class MainActivity extends FragmentActivity implements
 				todoSwipeList = getSwipeDismissList(aaTodoAdpt);
 				break;
 			}
-			
 
 		}
-		
-		private SwipeDismissList getSwipeDismissList(final ActivityItemArrayAdapter adapter){
+
+		private SwipeDismissList getSwipeDismissList(
+				final ActivityItemArrayAdapter adapter) {
 			return new SwipeDismissList(listViewToFill,
 					new SwipeDismissList.OnDismissCallback() {
 						public SwipeDismissList.Undoable onDismiss(
 								ListView listView, final int position) {
-							final ActivityItem item = adapter
-									.getItem(position);
+							final ActivityItem item = adapter.getItem(position);
 							adapter.remove(item);
 							return new SwipeDismissList.Undoable() {
 
@@ -640,7 +661,7 @@ public class MainActivity extends FragmentActivity implements
 						}
 					}, SwipeDismissList.UndoMode.MULTI_UNDO);
 		}
-		
+
 	}
 
 }
