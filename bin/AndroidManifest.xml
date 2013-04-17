@@ -30,7 +30,7 @@
             android:label="Preferences" >
         </activity>
 
-        <receiver android:name="MyBroadcastReceiver" >
+        <receiver android:name="com.example.habit1.AlarmReceiver" >
         </receiver>
     </application>
 

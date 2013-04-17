@@ -2,22 +2,21 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <PreferenceCategory
-        android:key="pref_key_notification_settings"
         android:title="Notification" >
         <CheckBoxPreference
             android:defaultValue="true"
-            android:key="pref_enableNotifications"
+            android:key="notificationsEnabled"
             android:summary="Notify when you have tasks expiring"
             android:title="Notification" />
 
         <com.example.habit1.TimePreference
-            android:key="pref_notify_time"
+            android:key="notificationTime"
             android:title="Time to notify" />
 
         <RingtonePreference
             android:name="Alarm"
             android:defaultValue="defaultRingtone"
-            android:key="pref_notif_sound"
+            android:key="notificationSound"
             android:ringtoneType="alarm"
             android:showDefault="true"
             android:title="Notification sound" >

@@ -37,81 +37,10 @@ import de.timroes.swipetodismiss.SwipeDismissList;
 public class MainActivity extends FragmentActivity implements
 		ActionBar.TabListener, OnClickListener {
 
-	public class PreferenceContainer {
-		int alertHour, alertMinute;
-		int[] alarmTime;
-		SharedPreferences settings;
-		final SharedPreferences.Editor editor;
-		Uri notificationSound, defaultSound;
-		boolean notificationEnabled;
-
-		public PreferenceContainer(){
-			settings = PreferenceManager
-					.getDefaultSharedPreferences(MainActivity.this);
-			editor = settings.edit();
-			defaultSound = Settings.System.DEFAULT_ALARM_ALERT_URI;
-			update();
-		}
-		
-		public void writeUnfinishedValues() {
-			editor.putInt("unfinishedCount", MainActivity.this.getUnfinishedCount());
-			editor.putFloat("xpGainIfFinished", (float) MainActivity.this.xpGainIfFinished());
-			editor.putFloat("hpLossIfUnfinished",
-					(float) MainActivity.this.hpLossIfUnfinished());
-			editor.commit();
-		}
-
-		private void update() {
-			retrieveNotificationSettings();
-		}
-
-		private void retrieveNotificationSettings() {
-			notificationEnabled = settings.getBoolean("notificationsEnabled",
-					true);
-			retrieveNotificationTime();
-			retrieveNotificationSound();
-		}
-
-		private void retrieveNotificationTime() {
-			String alert_time = settings.getString("notificationTime", "19:00");
-			String[] pieces = alert_time.split(":");
-			alertHour = Integer.parseInt(pieces[0]);
-			alertMinute = Integer.parseInt(pieces[1]);
-		}
-
-		private void retrieveNotificationSound() {
-			final String savedUri = settings.getString("notificationSound", "");
-			if (savedUri.length() > 0) {
-				// If the stored string is the bogus string...
-				if (savedUri.equals("defaultRingtone")) {
-					notificationSound = defaultSound;
-					editor.putString("notificationSound", notificationSound.toString());
-					editor.commit();
-				} else {
-					notificationSound = Uri.parse(savedUri);
-				}
-			}
-		}
-		
-		public boolean isNotificationEnabled(){
-			return notificationEnabled;
-		}
-		
-		public int getNotificationHour(){
-			return alertHour;
-		}
-		
-		public int getNotificationMinute(){
-			return alertMinute;
-		}
-		
-		public Uri getNotificationSound(){
-			return notificationSound;
-		}
-	}
-
 	private static SwipeDismissList dailySwipeList, habitSwipeList,
 			todoSwipeList;
+
+	PreferenceContainer preferences;
 	ActionBar actionBar;
 	TextView tvCharHp, tvCharXp, tvLvlProf;
 	ProgressBar pbCharHp, pbCharXp;
@@ -147,7 +76,7 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	private void initialize() {
-		loadPreferences();
+		preferences = new PreferenceContainer();
 		xp = 0;
 		maxXp = 50;
 		hp = 50;
@@ -199,7 +128,7 @@ public class MainActivity extends FragmentActivity implements
 				.setTabListener(this));
 
 		updateDisplay();
-		writeUnfinishedValues();
+		preferences.writeUnfinishedValues();
 
 	}
 
@@ -209,8 +138,8 @@ public class MainActivity extends FragmentActivity implements
 				this.getApplicationContext(), 234324243, intent, 0);
 		AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.HOUR_OF_DAY, alertHour);
-		calendar.set(Calendar.MINUTE, alertMinute);
+		calendar.set(Calendar.HOUR_OF_DAY, preferences.getNotificationHour());
+		calendar.set(Calendar.MINUTE, preferences.getNotificationMinute());
 		calendar.set(Calendar.SECOND, 00);
 
 		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
@@ -278,7 +207,7 @@ public class MainActivity extends FragmentActivity implements
 		pbCharXp.setProgress((int) xp);
 		tvCharHp.setText("HP: " + hp + "/50.0");
 		pbCharHp.setProgress((int) hp);
-		writeUnfinishedValues();
+		preferences.writeUnfinishedValues();
 	}
 
 	public void addXp(double amount) {
@@ -508,7 +437,7 @@ public class MainActivity extends FragmentActivity implements
 		super.onActivityResult(requestCode, resultCode, intent);
 		switch (requestCode) {
 		case SETTINGS_REQUEST_CODE:
-			loadPreferences();
+			preferences.update();
 			break;
 		}
 	}
@@ -570,10 +499,82 @@ public class MainActivity extends FragmentActivity implements
 			FragmentTransaction fragmentTransaction) {
 	}
 
-	/**
-	 * A dummy fragment representing a section of the app, but that simply
-	 * displays dummy text.
-	 */
+	public class PreferenceContainer {
+		int alertHour, alertMinute;
+		int[] alarmTime;
+		SharedPreferences settings;
+		final SharedPreferences.Editor editor;
+		Uri notificationSound, defaultSound;
+		boolean notificationEnabled;
+
+		public PreferenceContainer() {
+			settings = PreferenceManager
+					.getDefaultSharedPreferences(MainActivity.this);
+			editor = settings.edit();
+			defaultSound = Settings.System.DEFAULT_ALARM_ALERT_URI;
+			update();
+		}
+
+		public void writeUnfinishedValues() {
+			editor.putInt("unfinishedCount",
+					MainActivity.this.getUnfinishedCount());
+			editor.putFloat("xpGainIfFinished",
+					(float) MainActivity.this.xpGainIfFinished());
+			editor.putFloat("hpLossIfUnfinished",
+					(float) MainActivity.this.hpLossIfUnfinished());
+			editor.commit();
+		}
+
+		private void update() {
+			retrieveNotificationSettings();
+		}
+
+		private void retrieveNotificationSettings() {
+			notificationEnabled = settings.getBoolean("notificationsEnabled",
+					true);
+			retrieveNotificationTime();
+			retrieveNotificationSound();
+		}
+
+		private void retrieveNotificationTime() {
+			String alert_time = settings.getString("notificationTime", "19:00");
+			String[] pieces = alert_time.split(":");
+			alertHour = Integer.parseInt(pieces[0]);
+			alertMinute = Integer.parseInt(pieces[1]);
+		}
+
+		private void retrieveNotificationSound() {
+			final String savedUri = settings.getString("notificationSound", "");
+			if (savedUri.length() > 0) {
+				// If the stored string is the bogus string...
+				if (savedUri.equals("defaultRingtone")) {
+					notificationSound = defaultSound;
+					editor.putString("notificationSound",
+							notificationSound.toString());
+					editor.commit();
+				} else {
+					notificationSound = Uri.parse(savedUri);
+				}
+			}
+		}
+
+		public boolean isNotificationEnabled() {
+			return notificationEnabled;
+		}
+
+		public int getNotificationHour() {
+			return alertHour;
+		}
+
+		public int getNotificationMinute() {
+			return alertMinute;
+		}
+
+		public Uri getNotificationSound() {
+			return notificationSound;
+		}
+	}
+
 	public static class DummySectionFragment extends Fragment {
 		public static final String FRAGMENT_ID = "section_number";
 		private LayoutInflater inflater;
