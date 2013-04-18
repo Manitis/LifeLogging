@@ -47,7 +47,7 @@ public class MainActivity extends FragmentActivity implements
 	Button bAddNewItem, bAlert;
 	EditText eAddNewItem;
 	double xp, hp, maxXp, maxHp;
-	int level, unfinished_count;
+	int level, unfinishedCount;
 	final int SETTINGS_REQUEST_CODE = 1;
 	String[] profession = { "Peasant", "Jester", "Farmer", "Landlord",
 			"Priest", "Magician", "Mayor", "Lord", "Count", "Mayor",
@@ -69,7 +69,6 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	protected void onStop() {
 		super.onStop();
-		// Throw away all pending undos.
 		dailySwipeList.discardUndo();
 		habitSwipeList.discardUndo();
 		todoSwipeList.discardUndo();
@@ -82,7 +81,7 @@ public class MainActivity extends FragmentActivity implements
 		hp = 50;
 		maxHp = 50;
 		level = 1;
-		unfinished_count = 0;
+		unfinishedCount = 0;
 		dailyItems.add(new DailyItem("30 minutes of work out", 8, 4., this));
 		dailyItems.add(new DailyItem("Go to bed before 23", 5, 2, this));
 		dailyItems.add(new DailyItem("30 minutes of productivity", 8, 6, this));
