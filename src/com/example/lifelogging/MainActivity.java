@@ -1,4 +1,4 @@
-package com.example.habit1;
+package com.example.lifelogging;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,7 +39,6 @@ public class MainActivity extends FragmentActivity implements
 
 	private static SwipeDismissList dailySwipeList, habitSwipeList,
 			todoSwipeList;
-
 	PreferenceContainer preferences;
 	ActionBar actionBar;
 	TextView tvCharHp, tvCharXp, tvLvlProf;
@@ -66,13 +65,14 @@ public class MainActivity extends FragmentActivity implements
 
 	}
 
-	@Override
-	protected void onStop() {
-		super.onStop();
-		dailySwipeList.discardUndo();
-		habitSwipeList.discardUndo();
-		todoSwipeList.discardUndo();
-	}
+	//
+	// @Override
+	// protected void onStop() {
+	// super.onStop();
+	// dailySwipeList.discardUndo();
+	// habitSwipeList.discardUndo();
+	// todoSwipeList.discardUndo();
+	// }
 
 	private void initialize() {
 		preferences = new PreferenceContainer();
@@ -244,7 +244,9 @@ public class MainActivity extends FragmentActivity implements
 		double hpPen = 0;
 		switch (v.getId()) {
 		case (R.id.bAlert):
-			startAlert();
+			Intent intent = new Intent();
+			intent.setClass(MainActivity.this, ViewSingleItemActivity.class);
+			startActivity(intent);
 			break;
 		case (R.id.bAdd):
 			String itemText = eAddNewItem.getText().toString();
@@ -290,10 +292,10 @@ public class MainActivity extends FragmentActivity implements
 		xpRew = item.getXpRew();
 		itemCheckbox = (CheckBox) v;
 		if (itemCheckbox.isChecked()) {
-			item.setFinished(true);
+			item.finished(true);
 			addXp(xpRew);
 		} else {
-			item.setFinished(false);
+			item.finished(false);
 			subtractXp(xpRew);
 		}
 	}
@@ -308,10 +310,10 @@ public class MainActivity extends FragmentActivity implements
 		xpRew = item.getXpRew();
 		itemCheckbox = (CheckBox) v;
 		if (itemCheckbox.isChecked()) {
-			item.setFinished(true);
+			item.finished(true);
 			addXp(xpRew);
 		} else {
-			item.setFinished(false);
+			item.finished(false);
 			subtractXp(xpRew);
 		}
 	}
@@ -324,14 +326,6 @@ public class MainActivity extends FragmentActivity implements
 
 		final NumberPicker npXP = (NumberPicker) myView.findViewById(R.id.npXP);
 		final NumberPicker npHP = (NumberPicker) myView.findViewById(R.id.npHP);
-		npXP.setMinValue(1);
-		npXP.setMaxValue(10);
-		npXP.setWrapSelectorWheel(false);
-		npXP.setValue(5);
-		npHP.setMinValue(1);
-		npHP.setMaxValue(10);
-		npHP.setWrapSelectorWheel(false);
-		npHP.setValue(5);
 
 		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
@@ -360,14 +354,6 @@ public class MainActivity extends FragmentActivity implements
 
 		final NumberPicker npXP = (NumberPicker) myView.findViewById(R.id.npXP);
 		final NumberPicker npHP = (NumberPicker) myView.findViewById(R.id.npHP);
-		npXP.setMinValue(1);
-		npXP.setMaxValue(10);
-		npXP.setWrapSelectorWheel(false);
-		npXP.setValue(5);
-		npHP.setMinValue(1);
-		npHP.setMaxValue(10);
-		npHP.setWrapSelectorWheel(false);
-		npHP.setValue(5);
 
 		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
@@ -398,18 +384,6 @@ public class MainActivity extends FragmentActivity implements
 		final NumberPicker npHP = (NumberPicker) myView.findViewById(R.id.npHP);
 		final NumberPicker npDue = (NumberPicker) myView
 				.findViewById(R.id.npDue);
-		npXP.setMinValue(1);
-		npXP.setMaxValue(10);
-		npXP.setWrapSelectorWheel(false);
-		npXP.setValue(5);
-		npHP.setMinValue(1);
-		npHP.setMaxValue(10);
-		npHP.setWrapSelectorWheel(false);
-		npHP.setValue(5);
-		npDue.setMinValue(1);
-		npDue.setMaxValue(30);
-		npDue.setWrapSelectorWheel(false);
-		npDue.setValue(5);
 
 		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {

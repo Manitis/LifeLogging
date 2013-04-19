@@ -1,11 +1,11 @@
-package com.example.habit1;
+package com.example.lifelogging;
 
 import android.view.View;
 
-public class ActivityItem {
+public abstract class ActivityItem {
 	public String name;
 	public double xpRew, hpPen;
-	public boolean finished;
+	private boolean finished, locationEnabled;
 	protected MainActivity mainActivity;
 
 	public ActivityItem(String name, double xpRew, double hpPen, MainActivity mainActivity) {
@@ -16,21 +16,25 @@ public class ActivityItem {
 		this.finished = false;
 	}
 
-	public double update() {
-		return 0;
+	public abstract double update();
+	
+	public boolean isLocationEnabled(){
+		return locationEnabled;
 	}
-
+	
+	public void locationEnabled(boolean value){
+		this.locationEnabled = value;
+	}
+	
 	public boolean isFinished() {
 		return finished;
 	}
 
-	public void setFinished(boolean finished) {
-		this.finished = finished;
+	public void finished(boolean value) {
+		finished = value;
 	}
 
-	public double achieve() {
-		return xpRew;
-	}
+	public abstract void done();
 
 	public String getName() {
 		return name;

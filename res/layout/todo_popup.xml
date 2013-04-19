@@ -12,7 +12,6 @@
         android:orientation="vertical" >
 
         <RelativeLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
 
@@ -25,20 +24,28 @@
                 android:gravity="center"
                 android:text="XP reward" />
 
-            <NumberPicker
+            <com.example.lifelogging.ExtendedNumberPicker
                 android:id="@+id/npXP"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@+id/tvXP" />
+                android:layout_below="@+id/tvXP"
+                max_value="10"
+                min_value="1"
+                value="5"
+                wrap_wheel="false" />
 
-            <NumberPicker
+            <com.example.lifelogging.ExtendedNumberPicker
                 android:id="@+id/npHP"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tvXP"
                 android:layout_marginLeft="30sp"
-                android:layout_toRightOf="@+id/npXP" />
+                android:layout_toRightOf="@+id/npXP"
+                max_value="10"
+                min_value="1"
+                value="5"
+                wrap_wheel="false" />
 
             <TextView
                 android:id="@+id/tvHP"
@@ -50,13 +57,17 @@
                 android:gravity="center"
                 android:text="HP penalty" />
 
-            <NumberPicker
+            <com.example.lifelogging.ExtendedNumberPicker
                 android:id="@+id/npDue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tvXP"
                 android:layout_marginLeft="30sp"
-                android:layout_toRightOf="@+id/npHP" />
+                android:layout_toRightOf="@+id/npHP"
+                max_value="10"
+                min_value="1"
+                value="5"
+                wrap_wheel="false" />
 
             <TextView
                 android:id="@+id/tvDue"

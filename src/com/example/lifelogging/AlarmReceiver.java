@@ -1,4 +1,4 @@
-package com.example.habit1;
+package com.example.lifelogging;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,7 +11,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 
-import com.example.habit1.MainActivity.PreferenceContainer;
+import com.example.lifelogging.MainActivity.PreferenceContainer;
 
 public class AlarmReceiver extends BroadcastReceiver {
 

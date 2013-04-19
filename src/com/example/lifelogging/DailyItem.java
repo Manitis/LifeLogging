@@ -1,4 +1,4 @@
-package com.example.habit1;
+package com.example.lifelogging;
 
 import java.util.Date;
 
@@ -50,15 +50,14 @@ public class DailyItem extends ActivityItem {
 		return (new Date().getTime() - lastCompleted);
 	}
 
-	@Override
-	public double achieve() {
+	public void done() {
 		lastCompleted = new Date().getTime();
-		return xpRew;
+		finished(true);
 	}
 
 	@Override
 	public boolean isDueToday() {
-		return !finished;
+		return !isFinished();
 	}
 
 	@Override

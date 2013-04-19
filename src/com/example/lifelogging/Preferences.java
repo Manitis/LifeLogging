@@ -1,4 +1,4 @@
-package com.example.habit1;
+package com.example.lifelogging;
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;

@@ -1,4 +1,4 @@
-package com.example.habit1;
+package com.example.lifelogging;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -127,5 +127,10 @@ public class TodoItem extends ActivityItem {
 	public double incrementFunction(double value) {
 		long now = new Date().getTime();
 		return value * (now - created) / (due - created);
+	}
+
+	@Override
+	public void done() {
+		finished(true);
 	}
 }

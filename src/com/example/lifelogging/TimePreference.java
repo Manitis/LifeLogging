@@ -1,4 +1,4 @@
-package com.example.habit1;
+package com.example.lifelogging;
 
 import android.content.Context;
 import android.content.res.TypedArray;

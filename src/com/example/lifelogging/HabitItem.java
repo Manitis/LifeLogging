@@ -1,4 +1,4 @@
-package com.example.habit1;
+package com.example.lifelogging;
 
 import java.util.Date;
 
@@ -54,9 +54,14 @@ public class HabitItem extends ActivityItem {
 	}
 
 	@Override
-	public double achieve() {
+	public void done() {
 		lastCompleted = new Date().getTime();
-		return xpRew;
+	}
+
+	@Override
+	public double update() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }
