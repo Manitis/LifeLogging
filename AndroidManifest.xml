@@ -16,7 +16,6 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
@@ -48,6 +47,10 @@
         <activity
             android:name="com.example.lifelogging.ViewSingleItemActivity"
             android:label="Edit item" >
+        </activity>
+        <activity
+            android:name="com.example.lifelogging.SetItemLocation"
+            android:label="Set location" >
         </activity>
 
         <receiver android:name="com.example.lifelogging.AlarmReceiver" >

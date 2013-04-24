@@ -9,46 +9,56 @@
     android:weightSum="100" >
 
     <LinearLayout
-        android:layout_width="0dip"
+        android:id="@+id/itemClickBox"
+        android:layout_width="0sp"
         android:layout_height="wrap_content"
-        android:layout_marginRight="5sp"
-        android:layout_weight="20"
-        android:gravity="center"
-        android:orientation="vertical" >
+        android:layout_weight="90"
+        android:weightSum="90" >
+
+        <LinearLayout
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5sp"
+            android:layout_weight="20"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/tvItemXP"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="XP: 20"
+                android:textColor="@color/green"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvItemHP"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="HP: 10"
+                android:textColor="@color/red"
+                android:textSize="14sp" />
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/tvItemXP"
-            android:layout_width="match_parent"
+            android:id="@+id/tvItem"
+            android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="XP: 20"
-            android:textColor="@color/green"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/tvItemHP"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="HP: 10"
-            android:textColor="@color/red"
-            android:textSize="14sp" />
+            android:layout_marginRight="5sp"
+            android:layout_weight="70"
+            android:gravity="left"
+            android:text="Testing this textview"
+            android:textSize="16sp" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/tvItem"
-        android:layout_width="0dip"
-        android:layout_height="wrap_content"
-        android:layout_weight="70"
-        android:layout_marginRight="5sp"
-        android:gravity="left"
-        android:text="Testing this textview"
-        android:textSize="16sp" />
 
     <CheckBox
         android:id="@+id/cDailyDone"
         android:layout_width="0dip"
         android:layout_height="35sp"
-        android:layout_weight="10" />
+        android:layout_weight="10"
+        android:focusable="false"
+        android:focusableInTouchMode="false" />
 
 </LinearLayout>

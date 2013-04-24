@@ -3,7 +3,6 @@ package com.example.lifelogging;
 import java.util.Date;
 
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
@@ -35,7 +34,7 @@ public class DailyItem extends ActivityItem {
 		getViewReferences();
 		tvXP.setText("XP: " + Double.toString(this.getXpRew()));
 		tvHP.setText("HP: " + Double.toString(this.getHpPen()));
-		cDailyDone.setOnClickListener((OnClickListener) mainActivity);
+		cDailyDone.setOnClickListener(mainActivity);
 		tvItemName.setText(this.getName());
 	}
 

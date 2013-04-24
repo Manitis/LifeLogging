@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -25,6 +28,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -34,23 +39,29 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.timroes.swipetodismiss.SwipeDismissList;
 
+@SuppressLint("ValidFragment")
 public class MainActivity extends FragmentActivity implements
-		ActionBar.TabListener, OnClickListener {
+		ActionBar.TabListener, OnClickListener, OnItemClickListener {
 
 	private static SwipeDismissList dailySwipeList, habitSwipeList,
 			todoSwipeList;
 	PreferenceContainer preferences;
+	ActivityItem itemBeingEdited;
 	ActionBar actionBar;
 	TextView tvCharHp, tvCharXp, tvLvlProf;
 	ProgressBar pbCharHp, pbCharXp;
 	Button bAddNewItem, bAlert;
 	EditText eAddNewItem;
+	ListView dailyListView, habitListView, todoListView;
 	double xp, hp, maxXp, maxHp;
 	int level, unfinishedCount;
 	final int SETTINGS_REQUEST_CODE = 1;
+	final int EDIT_ITEM_REQUEST_CODE = 2;
 	String[] profession = { "Peasant", "Jester", "Farmer", "Landlord",
 			"Priest", "Magician", "Mayor", "Lord", "Count", "Mayor",
 			"Councilman", "King", "Pope" };
+	private int positionForItemBeingEdited;
+	private ActivityItemArrayAdapter adapterForItemBeingEdited;
 	static ActivityItemArrayAdapter aaDailyAdpt, aaTodoAdpt, aaHabitAdpt;
 	static List<ActivityItem> dailyItems = new ArrayList<ActivityItem>();
 	static List<ActivityItem> habitItems = new ArrayList<ActivityItem>();
@@ -89,6 +100,7 @@ public class MainActivity extends FragmentActivity implements
 		dailyItems.add(new DailyItem("Work on the big project", 10, 6, this));
 		dailyItems.add(new DailyItem("Clean apartment for 20 minutes", 4, 1.5,
 				this));
+		dailyItems.get(0).setLocation(new LatLng(55.675302, 12.489832));
 
 		todoItems
 				.add(new TodoItem("Buy milk on the way home", 5, 6, 0.5, this));
@@ -237,6 +249,64 @@ public class MainActivity extends FragmentActivity implements
 		updateDisplay();
 	}
 
+	@Override
+	public void onItemClick(AdapterView<?> parent, View v, int position,
+			long rowId) {
+		adapterForItemBeingEdited = (ActivityItemArrayAdapter) parent
+				.getAdapter();
+		positionForItemBeingEdited = position;
+		itemBeingEdited = adapterForItemBeingEdited.getItem(position);
+		startActivityForResult(getOpenItemIntent(itemBeingEdited),
+				EDIT_ITEM_REQUEST_CODE);
+
+	}
+
+	private Intent getOpenItemIntent(ActivityItem item) {
+		Intent intent = new Intent();
+		intent.setClass(MainActivity.this, ViewSingleItemActivity.class);
+		intent.putExtra("name", item.name);
+		intent.putExtra("description", item.description);
+		intent.putExtra("hpPen", item.hpPen);
+		intent.putExtra("xpRew", item.xpRew);
+		if (item.isLocationEnabled()) {
+			intent.putExtra("locationEnabled", item.isLocationEnabled());
+			intent.putExtra("lat", item.getLocation().latitude);
+			intent.putExtra("lon", item.getLocation().longitude);
+		}
+		return intent;
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode,
+			Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
+		if (resultCode != RESULT_CANCELED) {
+		} else {
+			switch (requestCode) {
+			case SETTINGS_REQUEST_CODE:
+				preferences.update();
+				break;
+			case EDIT_ITEM_REQUEST_CODE:
+				ActivityItem item = adapterForItemBeingEdited
+						.getItem(positionForItemBeingEdited);
+				Bundle extras = intent.getExtras();
+				item.name = extras.getString("name");
+				item.description = extras.getString("description");
+				item.xpRew = extras.getDouble("xpRew");
+				item.hpPen = extras.getDouble("hpPen");
+				item.setLocationEnabled(extras.getBoolean("locationEnabled"));
+				if (item.isLocationEnabled()) {
+					item.setLocation(new LatLng(extras.getDouble("lat"), extras
+							.getDouble("lon")));
+				}
+				adapterForItemBeingEdited.insert(itemBeingEdited,
+						positionForItemBeingEdited);
+				adapterForItemBeingEdited.notifyDataSetChanged();
+				break;
+			}
+		}
+	}
+	
 	@Override
 	public void onClick(View v) {
 		ListView lvParent;
@@ -404,16 +474,7 @@ public class MainActivity extends FragmentActivity implements
 		dialog.show();
 	}
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode,
-			Intent intent) {
-		super.onActivityResult(requestCode, resultCode, intent);
-		switch (requestCode) {
-		case SETTINGS_REQUEST_CODE:
-			preferences.update();
-			break;
-		}
-	}
+
 
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -454,7 +515,7 @@ public class MainActivity extends FragmentActivity implements
 			FragmentTransaction fragmentTransaction) {
 		// When the given tab is selected, show the tab contents in the
 		// container view.
-		Fragment fragment = new DummySectionFragment();
+		Fragment fragment = new DummySectionFragment(this);
 		Bundle args = new Bundle();
 		args.putInt(DummySectionFragment.FRAGMENT_ID, tab.getPosition());
 		fragment.setArguments(args);
@@ -553,6 +614,7 @@ public class MainActivity extends FragmentActivity implements
 		private LayoutInflater inflater;
 		private ViewGroup container;
 		private View fragmentView;
+		private MainActivity mainActivity;
 		private ListView listViewToFill;
 		private int itemType;
 		private final int DAILY = 0;
@@ -565,6 +627,10 @@ public class MainActivity extends FragmentActivity implements
 				R.layout.list_layout_habit, R.layout.list_layout_todo };
 
 		public DummySectionFragment() {
+		}
+
+		public DummySectionFragment(MainActivity mainActivity) {
+			this.mainActivity = mainActivity;
 		}
 
 		@Override
@@ -582,6 +648,7 @@ public class MainActivity extends FragmentActivity implements
 					false);
 			listViewToFill = (ListView) fragmentView
 					.findViewById(listviewID[itemType]);
+			listViewToFill.setOnItemClickListener(mainActivity);
 			switch (itemType) {
 			case DAILY:
 				aaDailyAdpt = new ActivityItemArrayAdapter(dailyItems,

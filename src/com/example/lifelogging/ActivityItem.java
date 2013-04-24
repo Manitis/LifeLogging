@@ -2,13 +2,17 @@ package com.example.lifelogging;
 
 import android.view.View;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public abstract class ActivityItem {
-	public String name;
+	public String name, description;
 	public double xpRew, hpPen;
 	private boolean finished, locationEnabled;
 	protected MainActivity mainActivity;
+	private LatLng location;
 
-	public ActivityItem(String name, double xpRew, double hpPen, MainActivity mainActivity) {
+	public ActivityItem(String name, double xpRew, double hpPen,
+			MainActivity mainActivity) {
 		this.name = name;
 		this.xpRew = xpRew;
 		this.hpPen = hpPen;
@@ -17,15 +21,24 @@ public abstract class ActivityItem {
 	}
 
 	public abstract double update();
-	
-	public boolean isLocationEnabled(){
+
+	public boolean isLocationEnabled() {
 		return locationEnabled;
 	}
-	
-	public void locationEnabled(boolean value){
-		this.locationEnabled = value;
+
+	public void setLocationEnabled(boolean value) {
+		locationEnabled = value;
 	}
-	
+
+	public void setLocation(LatLng value) {
+		locationEnabled = true;
+		location = value;
+	}
+
+	public LatLng getLocation() {
+		return location;
+	}
+
 	public boolean isFinished() {
 		return finished;
 	}
@@ -48,9 +61,7 @@ public abstract class ActivityItem {
 		return hpPen;
 	}
 
-	public View makeView(View convertView) {
-		return null;
-	}
+	public abstract View makeView(View convertView);
 
 	public boolean isDueToday() {
 		return false;

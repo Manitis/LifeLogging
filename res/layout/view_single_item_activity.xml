@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="5dp" >
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
 
     <EditText
         android:id="@+id/etItemName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="4dp"
         android:ems="10"
         android:hint="Item name"
-        android:textSize="30sp" />
+        android:textSize="22sp" />
 
     <EditText
         android:id="@+id/etItemDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="4dp"
         android:ems="10"
-        android:hint="Item Description"
-        android:textSize="20sp" />
+        android:hint="Item description"
+        android:textSize="18sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,15 +39,17 @@
                 android:id="@+id/tvItemXP"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="4dp"
                 android:gravity="center"
-                android:text="XP reward"
+                android:text="Initial XP reward"
                 android:textColor="@color/green"
-                android:textSize="20sp" />
+                android:textSize="18sp" />
 
             <com.example.lifelogging.ExtendedNumberPicker
                 android:id="@+id/npXP"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="4dp"
                 max_value="100"
                 min_value="1"
                 value="5"
@@ -64,15 +67,17 @@
                 android:id="@+id/tvItemHP"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="4dp"
                 android:gravity="center"
-                android:text="HP penalty"
+                android:text="Initial HP penalty"
                 android:textColor="@color/red"
-                android:textSize="20sp" />
+                android:textSize="18sp" />
 
             <com.example.lifelogging.ExtendedNumberPicker
                 android:id="@+id/npHP"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="4dp"
                 max_value="100"
                 min_value="1"
                 value="5"
@@ -80,12 +85,41 @@
         </LinearLayout>
     </LinearLayout>
 
-        <fragment
-        android:id="@+id/mEditItemLocation"
-        android:layout_weight="1"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="0sp"
-        class="com.google.android.gms.maps.MapFragment" />
-    
+        android:layout_height="48sp"
+        android:gravity="left"
+        android:orientation="horizontal" >
+
+        <CheckedTextView
+            android:id="@+id/ctv_locationAlert"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignBaseline="@+id/cbEnableLocationAlert"
+            android:layout_alignBottom="@+id/cbEnableLocationAlert"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="4dp"
+            android:layout_toLeftOf="@+id/cbEnableLocationAlert"
+            android:gravity="left|center_vertical"
+            android:text="Alert me when nearby"
+            android:textSize="20sp" />
+
+        <CheckBox
+            android:id="@+id/cbEnableLocationAlert"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="4dp" />
+    </RelativeLayout>
+
+    <CheckedTextView
+        android:id="@+id/ctv_setLocation"
+        android:layout_width="match_parent"
+        android:layout_height="48sp"
+        android:layout_margin="4dp"
+        android:gravity="center_vertical"
+        android:text="Set location"
+        android:textSize="20sp" />
 
 </LinearLayout>
