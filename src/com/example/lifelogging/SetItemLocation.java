@@ -7,6 +7,9 @@ import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -22,12 +25,14 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class SetItemLocation extends Activity implements OnMapClickListener,
-		OnMapLongClickListener, OnMarkerDragListener {
+		OnMapLongClickListener, OnMarkerDragListener, OnSeekBarChangeListener {
 	private GoogleMap map;
 	LatLng location;
 	boolean locationEnabled;
 	Marker locationMarker = null;
 	Circle locationArea = null;
+	SeekBar sbLocationArea;
+	TextView tvLocationArea;
 	final int RQS_GooglePlayServices = 1;
 
 	Location myLocation;
@@ -47,6 +52,7 @@ public class SetItemLocation extends Activity implements OnMapClickListener,
 		map.setOnMapClickListener(this);
 		map.setOnMapLongClickListener(this);
 		map.setOnMarkerDragListener(this);
+		sbLocationArea.setOnSeekBarChangeListener(this);
 	}
 
 	@Override
@@ -63,8 +69,7 @@ public class SetItemLocation extends Activity implements OnMapClickListener,
 			String LicenseInfo = GooglePlayServicesUtil
 					.getOpenSourceSoftwareLicenseInfo(getApplicationContext());
 			AlertDialog.Builder LicenseDialog = new AlertDialog.Builder(this);
-			LicenseDialog.setTitle("Legal Notices");
-			LicenseDialog.setMessage(LicenseInfo);
+			LicenseDialog.setTitle("Legal Notices").setMessage(LicenseInfo);
 			LicenseDialog.show();
 			return true;
 		case R.id.menu_set_location_save:
@@ -78,6 +83,8 @@ public class SetItemLocation extends Activity implements OnMapClickListener,
 	private void getViewReferences() {
 		map = ((MapFragment) getFragmentManager().findFragmentById(
 				R.id.mEditItemLocation)).getMap();
+		sbLocationArea = (SeekBar) findViewById(R.id.sbLocationArea);
+		tvLocationArea = (TextView) findViewById(R.id.tvLocationRange);
 	}
 
 	private void makeMarker(LatLng point) {
@@ -94,7 +101,8 @@ public class SetItemLocation extends Activity implements OnMapClickListener,
 		Bundle extras = getIntent().getExtras();
 		locationEnabled = extras.getBoolean("locationEnabled");
 		if (locationEnabled) {
-			location = new LatLng(extras.getDouble("lat"), extras.getDouble("lon"));
+			location = new LatLng(extras.getDouble("lat"),
+					extras.getDouble("lon"));
 		}
 	}
 
@@ -147,11 +155,29 @@ public class SetItemLocation extends Activity implements OnMapClickListener,
 				&& Math.abs(endingPos.longitude - startingPos.longitude) < 0.0005) {
 			locationMarker.remove();
 			locationArea.remove();
+		} else {
+			locationArea.setCenter(marker.getPosition());
 		}
 	}
 
 	@Override
 	public void onMarkerDragStart(Marker marker) {
 		startingPos = marker.getPosition();
+	}
+
+	@Override
+	public void onProgressChanged(SeekBar seekBar, int progress,
+			boolean fromUser) {
+		locationArea.setRadius(progress * 100);
+		tvLocationArea.setText(Integer.toString(progress * 100));
+
+	}
+
+	@Override
+	public void onStartTrackingTouch(SeekBar seekBar) {
+	}
+
+	@Override
+	public void onStopTrackingTouch(SeekBar seekBar) {
 	}
 }

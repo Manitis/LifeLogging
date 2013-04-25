@@ -27,6 +27,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:layout_marginLeft="4sp"
+            android:layout_marginRight="4sp"
             android:gravity="center|center_vertical"
             android:text="500"
             android:textSize="20sp" />
@@ -35,11 +37,26 @@
             android:id="@+id/sbLocationArea"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
+            android:layout_marginLeft="4sp"
+            android:layout_marginRight="4sp"
             android:layout_toLeftOf="@+id/tvLocationRange"
+            android:layout_toRightOf="@+id/uuRadius"
             android:max="50" />
 
+        <TextView
+            android:id="@+id/uuRadius"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/tvLocationRange"
+            android:layout_alignBottom="@+id/tvLocationRange"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="4sp"
+            android:layout_marginRight="4sp"
+            android:gravity="center|center_vertical"
+            android:text="Radius"
+            android:textSize="20sp" />
     </RelativeLayout>
 
 </RelativeLayout>
