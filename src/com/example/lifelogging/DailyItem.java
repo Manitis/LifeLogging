@@ -2,25 +2,38 @@ package com.example.lifelogging;
 
 import java.util.Date;
 
+import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
-public class DailyItem extends ActivityItem {
-	public String name;
-	public double xpRew, hpPen;
-	public long created, lastCompleted, lastUpdated;
-	private View convertView;
-	private CheckBox cDailyDone;
-	private TextView tvItemName, tvXP, tvHP;
+import com.google.android.gms.maps.model.LatLng;
 
-	public DailyItem(String name, double xpRew, double hpPen, MainActivity mainActivity) {
+public class DailyItem extends ActivityItem {
+	public CheckBox cDone;
+	public TextView tvItemName, tvXP, tvHP, tvDue;
+
+	public DailyItem(String name, double xpRew, double hpPen,
+			MainActivity mainActivity) {
 		super(name, xpRew, hpPen, mainActivity);
-		this.name = name;
-		this.xpRew = xpRew;
-		this.hpPen = hpPen;
-		this.created = new Date().getTime();
-		this.lastCompleted = new Date().getTime();
+		this.itemType = MainActivity.DAILY;
+	}
+
+	public DailyItem(String name, double xpRew, double hpPen,
+			MainActivity mainActivity, LatLng location) {
+		super(name, xpRew, hpPen, mainActivity, location);
+		this.itemType = MainActivity.DAILY;
+	}
+
+	public DailyItem(String name, double xpRew, double hpPen,
+			MainActivity mainActivity, LatLng location, int locationArea) {
+		super(name, xpRew, hpPen, mainActivity, location, locationArea);
+		this.itemType = MainActivity.DAILY;
+	}
+
+	public DailyItem(Bundle bundle) {
+		super(bundle);
 	}
 
 	@Override
@@ -32,17 +45,18 @@ public class DailyItem extends ActivityItem {
 
 	private void setupViews() {
 		getViewReferences();
-		tvXP.setText("XP: " + Double.toString(this.getXpRew()));
-		tvHP.setText("HP: " + Double.toString(this.getHpPen()));
-		cDailyDone.setOnClickListener(mainActivity);
-		tvItemName.setText(this.getName());
+		tvXP.setText("XP: " + Double.toString(xpRew()));
+		tvHP.setText("HP: " + Double.toString(hpPen()));
+		cDone.setChecked(isFinished());
+		cDone.setOnClickListener(mainActivity);
+		tvItemName.setText(this.name());
 	}
 
 	private void getViewReferences() {
-		tvItemName = (TextView) convertView.findViewById(R.id.tvItem);
+		tvItemName = (TextView) convertView.findViewById(R.id.tvItemName);
 		tvXP = (TextView) convertView.findViewById(R.id.tvItemXP);
 		tvHP = (TextView) convertView.findViewById(R.id.tvItemHP);
-		cDailyDone = (CheckBox) convertView.findViewById(R.id.cDailyDone);
+		cDone = (CheckBox) convertView.findViewById(R.id.cDone);
 	}
 
 	public long timeSinceLastComp() {
@@ -68,4 +82,5 @@ public class DailyItem extends ActivityItem {
 			return 0;
 		}
 	}
+
 }

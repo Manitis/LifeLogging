@@ -113,13 +113,7 @@
             android:layout_alignTop="@id/bAdd"
             android:layout_toLeftOf="@+id/bAdd"
             android:hint="@string/add_item" />
-    </RelativeLayout>
 
-    <Button
-        android:id="@+id/bAlert"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:text="Test" />
+    </RelativeLayout>
 
 </RelativeLayout>

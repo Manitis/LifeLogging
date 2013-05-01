@@ -16,33 +16,47 @@
     <RelativeLayout
         android:id="@+id/rl_bottomContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?android:attr/listPreferredItemHeight"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_margin="4sp" >
 
-        <TextView
-            android:id="@+id/tvLocationRange"
+        <SeekBar
+            android:id="@+id/sbLocationArea"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
+<<<<<<< HEAD
             android:layout_centerVertical="true"
             android:layout_marginLeft="4sp"
             android:layout_marginRight="4sp"
             android:gravity="center|center_vertical"
             android:text="500"
             android:textSize="20sp" />
+=======
+            android:max="50" />
+>>>>>>> Implemented sorting, greying out finished items and cleaned up item
 
-        <SeekBar
-            android:id="@+id/sbLocationArea"
+        <TextView
+            android:id="@+id/tvLocationArea"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+<<<<<<< HEAD
             android:layout_alignParentTop="true"
             android:layout_marginLeft="4sp"
             android:layout_marginRight="4sp"
             android:layout_toLeftOf="@+id/tvLocationRange"
             android:layout_toRightOf="@+id/uuRadius"
             android:max="50" />
+=======
+            android:layout_above="@+id/sbLocationArea"
+            android:layout_alignParentLeft="true"
+            android:gravity="center|center_vertical"
+            android:text="Radius: 500m"
+            android:textSize="20sp" />
+>>>>>>> Implemented sorting, greying out finished items and cleaned up item
 
         <TextView
             android:id="@+id/uuRadius"

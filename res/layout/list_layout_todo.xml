@@ -21,7 +21,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="XP: 20"
             android:textColor="@color/green"
             android:textSize="14sp" />
 
@@ -30,7 +29,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="HP: 10"
             android:textColor="@color/red"
             android:textSize="14sp" />
     </LinearLayout>
@@ -47,7 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Due in:"
+            android:text="Time left:"
             android:textSize="14sp" />
 
         <TextView
@@ -55,23 +53,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="0 days"
             android:textSize="14sp" />
     </LinearLayout>
 
     <TextView
-        android:id="@+id/tvItem"
+        android:id="@+id/tvItemName"
         android:layout_width="0dip"
         android:layout_height="match_parent"
         android:layout_weight="50"
         android:padding="0sp"
         android:gravity="left"
-        android:text="Testing this textview asdasdas"
         android:textSize="16sp" />
 
     <CheckBox
-        android:id="@+id/cTodoDone"
+        android:id="@+id/cDone"
         android:layout_width="0dip"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:layout_height="35sp"
         android:layout_weight="10" />
 

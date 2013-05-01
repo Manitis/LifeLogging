@@ -10,5 +10,29 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/menu_settings"/>
+    <item
+        android:title="Sort"
+        android:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/menuSortAlpha"
+                android:title="Sort alphabetically"/>
+            <item
+                android:id="@+id/menuSortByXP"
+                android:title="Sort by XP reward"/>
+            <item
+                android:id="@+id/menuSortByHP"
+                android:title="Sort by HP penalty"/>
+            <item
+                android:id="@+id/menuSortByDueDate"
+                android:title="Sort by time left"/>
+            <item
+                android:id="@+id/menuSortByCreated"
+                android:title="Sort by date created"/>
+            <item
+                android:id="@+id/menuSortByLastCompleted"
+                android:title="Sort by last completion"/>
+        </menu>
+    </item>
 
 </menu>

@@ -7,5 +7,6 @@
     <color name="red">#d00</color>
     <color name="green">#0c0</color>
     <color name="holoblue">#33b5e5</color>
+    <color name="transparent">#00000000</color>
 
 </resources>

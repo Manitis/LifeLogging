@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.AlarmManager;
@@ -37,6 +35,10 @@ import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.doomonafireball.betterpickers.datepicker.DatePickerDialogFragment;
+import com.google.android.gms.maps.model.LatLng;
+
 import de.timroes.swipetodismiss.SwipeDismissList;
 
 @SuppressLint("ValidFragment")
@@ -45,27 +47,30 @@ public class MainActivity extends FragmentActivity implements
 
 	private static SwipeDismissList dailySwipeList, habitSwipeList,
 			todoSwipeList;
+
+	ItemAdapter adapterForItemBeingEdited;
+	int positionForItemBeingEdited = -1;
 	PreferenceContainer preferences;
-	ActivityItem itemBeingEdited;
+	ActivityItem item;
+	LayoutInflater inflater;
 	ActionBar actionBar;
 	TextView tvCharHp, tvCharXp, tvLvlProf;
 	ProgressBar pbCharHp, pbCharXp;
-	Button bAddNewItem, bAlert;
+	Button bAddNewItem;
 	EditText eAddNewItem;
 	ListView dailyListView, habitListView, todoListView;
 	double xp, hp, maxXp, maxHp;
+	int lastSort = ItemAdapter.ALPHA, sortType;
+	boolean direction = true;
 	int level, unfinishedCount;
 	final int SETTINGS_REQUEST_CODE = 1;
 	final int EDIT_ITEM_REQUEST_CODE = 2;
+	static final int DAILY = 0, HABIT = 1, TODO = 2;
 	String[] profession = { "Peasant", "Jester", "Farmer", "Landlord",
 			"Priest", "Magician", "Mayor", "Lord", "Count", "Mayor",
 			"Councilman", "King", "Pope" };
-	private int positionForItemBeingEdited;
-	private ActivityItemArrayAdapter adapterForItemBeingEdited;
-	static ActivityItemArrayAdapter aaDailyAdpt, aaTodoAdpt, aaHabitAdpt;
-	static List<ActivityItem> dailyItems = new ArrayList<ActivityItem>();
-	static List<ActivityItem> habitItems = new ArrayList<ActivityItem>();
-	static List<ActivityItem> todoItems = new ArrayList<ActivityItem>();
+
+	static ItemAdapter dailyItems, habitItems, todoItems;
 	private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
 
 	@Override
@@ -76,7 +81,6 @@ public class MainActivity extends FragmentActivity implements
 
 	}
 
-	//
 	// @Override
 	// protected void onStop() {
 	// super.onStop();
@@ -93,14 +97,21 @@ public class MainActivity extends FragmentActivity implements
 		maxHp = 50;
 		level = 1;
 		unfinishedCount = 0;
-		dailyItems.add(new DailyItem("30 minutes of work out", 8, 4., this));
+		dailyItems = new ItemAdapter(MainActivity.this,
+				R.layout.list_layout_daily);
+		habitItems = new ItemAdapter(MainActivity.this,
+				R.layout.list_layout_habit);
+		todoItems = new ItemAdapter(MainActivity.this,
+				R.layout.list_layout_todo);
+
+		dailyItems.add(new DailyItem("30 minutes of work out", 8, 4., this,
+				new LatLng(55.675302, 12.489832)));
 		dailyItems.add(new DailyItem("Go to bed before 23", 5, 2, this));
 		dailyItems.add(new DailyItem("30 minutes of productivity", 8, 6, this));
 		dailyItems.add(new DailyItem("30 minutes of homework", 6, 3, this));
 		dailyItems.add(new DailyItem("Work on the big project", 10, 6, this));
 		dailyItems.add(new DailyItem("Clean apartment for 20 minutes", 4, 1.5,
 				this));
-		dailyItems.get(0).setLocation(new LatLng(55.675302, 12.489832));
 
 		todoItems
 				.add(new TodoItem("Buy milk on the way home", 5, 6, 0.5, this));
@@ -121,16 +132,12 @@ public class MainActivity extends FragmentActivity implements
 		pbCharXp = (ProgressBar) findViewById(R.id.pbCharXP);
 
 		eAddNewItem = (EditText) findViewById(R.id.eNewItem);
-		bAlert = (Button) findViewById(R.id.bAlert);
-		bAlert.setOnClickListener(this);
 		bAddNewItem = (Button) findViewById(R.id.bAdd);
 		bAddNewItem.setOnClickListener(this);
+		inflater = getLayoutInflater();
 
-		// Set up the action bar to show tabs.
 		actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-		// For each of the sections in the app, add a tab to the action bar.
 		actionBar.addTab(actionBar.newTab().setText(R.string.title_section1)
 				.setTabListener(this));
 		actionBar.addTab(actionBar.newTab().setText(R.string.title_section2)
@@ -140,7 +147,6 @@ public class MainActivity extends FragmentActivity implements
 
 		updateDisplay();
 		preferences.writeUnfinishedValues();
-
 	}
 
 	public void startAlert() {
@@ -155,8 +161,6 @@ public class MainActivity extends FragmentActivity implements
 
 		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
 				calendar.getTimeInMillis(), 24 * 60 * 60 * 1000, pendingIntent);
-		alarmManager.set(AlarmManager.RTC_WAKEUP,
-				System.currentTimeMillis() + 2 * 1000, pendingIntent);
 	}
 
 	public void outputUnfinishedItemValues() {
@@ -172,10 +176,9 @@ public class MainActivity extends FragmentActivity implements
 		return result;
 	}
 
-	public List<ActivityItem> getUnfinishedItemsInList(
-			List<ActivityItem> inputList) {
+	public List<ActivityItem> getUnfinishedItemsInList(ItemAdapter list) {
 		List<ActivityItem> result = new ArrayList<ActivityItem>();
-		for (ActivityItem item : inputList) {
+		for (ActivityItem item : list.items) {
 			if (item.isDueToday() && !item.isFinished()) {
 				result.add(item);
 			}
@@ -185,7 +188,6 @@ public class MainActivity extends FragmentActivity implements
 
 	public int getUnfinishedCount() {
 		int result = getUnfinishedItems().size();
-
 		return result;
 	}
 
@@ -193,7 +195,7 @@ public class MainActivity extends FragmentActivity implements
 		double hpLoss = 0;
 		List<ActivityItem> unfinishedItems = getUnfinishedItems();
 		for (ActivityItem item : unfinishedItems) {
-			hpLoss += item.getHpPen();
+			hpLoss += item.hpPen();
 		}
 		return hpLoss;
 	}
@@ -202,7 +204,7 @@ public class MainActivity extends FragmentActivity implements
 		double xpReward = 0;
 		List<ActivityItem> unfinishedItems = getUnfinishedItems();
 		for (ActivityItem item : unfinishedItems) {
-			xpReward += item.getXpRew();
+			xpReward += item.xpRew();
 		}
 		return xpReward;
 	}
@@ -252,27 +254,35 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public void onItemClick(AdapterView<?> parent, View v, int position,
 			long rowId) {
-		adapterForItemBeingEdited = (ActivityItemArrayAdapter) parent
-				.getAdapter();
+		ItemAdapter adapter = (ItemAdapter) parent.getAdapter();
+		View parentView = (View) v.getParent();
+		int itemType = -1;
+		int id = parentView.getId();
+		switch (id) {
+		case R.id.lvDaily:
+			adapterForItemBeingEdited = dailyItems;
+			itemType = DAILY;
+			break;
+		case R.id.lvHabit:
+			adapterForItemBeingEdited = habitItems;
+			itemType = HABIT;
+			break;
+		case R.id.lvTodo:
+			adapterForItemBeingEdited = todoItems;
+			itemType = TODO;
+			break;
+		}
 		positionForItemBeingEdited = position;
-		itemBeingEdited = adapterForItemBeingEdited.getItem(position);
-		startActivityForResult(getOpenItemIntent(itemBeingEdited),
+		item = adapter.getItem(position);
+		startActivityForResult(getOpenItemIntent(item, itemType),
 				EDIT_ITEM_REQUEST_CODE);
 
 	}
 
-	private Intent getOpenItemIntent(ActivityItem item) {
+	private Intent getOpenItemIntent(ActivityItem item, int itemType) {
 		Intent intent = new Intent();
 		intent.setClass(MainActivity.this, ViewSingleItemActivity.class);
-		intent.putExtra("name", item.name);
-		intent.putExtra("description", item.description);
-		intent.putExtra("hpPen", item.hpPen);
-		intent.putExtra("xpRew", item.xpRew);
-		if (item.isLocationEnabled()) {
-			intent.putExtra("locationEnabled", item.isLocationEnabled());
-			intent.putExtra("lat", item.getLocation().latitude);
-			intent.putExtra("lon", item.getLocation().longitude);
-		}
+		intent.putExtras(item.getBundle());
 		return intent;
 	}
 
@@ -280,87 +290,68 @@ public class MainActivity extends FragmentActivity implements
 	protected void onActivityResult(int requestCode, int resultCode,
 			Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
-		if (resultCode != RESULT_CANCELED) {
+		if (resultCode == RESULT_CANCELED) {
 		} else {
 			switch (requestCode) {
 			case SETTINGS_REQUEST_CODE:
 				preferences.update();
 				break;
 			case EDIT_ITEM_REQUEST_CODE:
-				ActivityItem item = adapterForItemBeingEdited
-						.getItem(positionForItemBeingEdited);
 				Bundle extras = intent.getExtras();
-				item.name = extras.getString("name");
-				item.description = extras.getString("description");
-				item.xpRew = extras.getDouble("xpRew");
-				item.hpPen = extras.getDouble("hpPen");
-				item.setLocationEnabled(extras.getBoolean("locationEnabled"));
-				if (item.isLocationEnabled()) {
-					item.setLocation(new LatLng(extras.getDouble("lat"), extras
-							.getDouble("lon")));
+				ActivityItem item = null;
+				int itemType = extras.getInt("itemType");
+				switch (itemType) {
+				case DAILY:
+					item = new DailyItem(extras);
+					break;
+				case HABIT:
+					item = new HabitItem(extras);
+					break;
+				case TODO:
+					item = new TodoItem(extras);
+					break;
 				}
-				adapterForItemBeingEdited.insert(itemBeingEdited,
-						positionForItemBeingEdited);
-				adapterForItemBeingEdited.notifyDataSetChanged();
+				adapterForItemBeingEdited
+						.edit(positionForItemBeingEdited, item);
 				break;
 			}
 		}
 	}
-	
+
 	@Override
 	public void onClick(View v) {
 		ListView lvParent;
 		double xpRew = 0;
 		double hpPen = 0;
 		switch (v.getId()) {
-		case (R.id.bAlert):
-			Intent intent = new Intent();
-			intent.setClass(MainActivity.this, ViewSingleItemActivity.class);
-			startActivity(intent);
-			break;
 		case (R.id.bAdd):
-			String itemText = eAddNewItem.getText().toString();
-
-			switch (actionBar.getSelectedNavigationIndex()) {
-			case (0):
-				newDailyDialog(itemText);
-				break;
-			case (1):
-				newHabitDialog(itemText);
-				break;
-			case (2):
-				newTodoDialog(itemText);
-				break;
-			}
+			newItemDialog();
 			break;
 		case (R.id.bDown):
 			lvParent = (ListView) v.getParent().getParent();
-			hpPen = habitItems.get(lvParent.getPositionForView(v)).getHpPen();
+			hpPen = habitItems.getItem(lvParent.getPositionForView(v)).hpPen();
 			subtractHp(hpPen);
 			break;
 		case (R.id.bUp):
 			lvParent = (ListView) v.getParent().getParent();
-			xpRew = habitItems.get(lvParent.getPositionForView(v)).getXpRew();
+			xpRew = habitItems.getItem(lvParent.getPositionForView(v)).xpRew();
 			addXp(xpRew);
 			break;
-		case (R.id.cDailyDone):
-			dailyDone(v);
-			break;
-		case (R.id.cTodoDone):
-			todoDone(v);
+		case (R.id.cDone):
+			itemDone(v);
 			break;
 		}
 	}
 
-	private void dailyDone(View v) {
-		ListView lvParent;
-		CheckBox itemCheckbox;
+	private void itemDone(View v) {
+		CheckBox itemCheckbox = (CheckBox) v;
 		double xpRew = 0;
-		lvParent = (ListView) v.getParent().getParent();
-		DailyItem item = (DailyItem) dailyItems.get(lvParent
-				.getPositionForView(v));
-		xpRew = item.getXpRew();
-		itemCheckbox = (CheckBox) v;
+		ListView parent = (ListView) v.getParent().getParent();
+		int position = parent.getPositionForView(v);
+		ItemAdapter items = getListFromType(getItemType());
+		View row = items.parent.getChildAt(position);
+		ActivityItem item = (ActivityItem) items.getItem(position);
+		xpRew = item.xpRew();
 		if (itemCheckbox.isChecked()) {
 			item.finished(true);
 			addXp(xpRew);
@@ -368,88 +359,18 @@ public class MainActivity extends FragmentActivity implements
 			item.finished(false);
 			subtractXp(xpRew);
 		}
-	}
-
-	private void todoDone(View v) {
-		ListView lvParent;
-		CheckBox itemCheckbox;
-		double xpRew = 0;
-		lvParent = (ListView) v.getParent().getParent();
-		TodoItem item = (TodoItem) todoItems
-				.get(lvParent.getPositionForView(v));
-		xpRew = item.getXpRew();
-		itemCheckbox = (CheckBox) v;
-		if (itemCheckbox.isChecked()) {
-			item.finished(true);
-			addXp(xpRew);
+		if (item.isFinished()) {
+			row.setBackgroundColor(0x22222222);
 		} else {
-			item.finished(false);
-			subtractXp(xpRew);
+			row.setBackgroundColor(0x00000000);
 		}
+		items.sort(lastSort, direction);
 	}
 
-	public void newDailyDialog(final String itemName) {
+	public void newItemDialog() {
+		final String name = eAddNewItem.getText().toString();
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		LayoutInflater inflater = getLayoutInflater();
-		View myView = null;
-		myView = inflater.inflate(R.layout.daily_popup, null);
-
-		final NumberPicker npXP = (NumberPicker) myView.findViewById(R.id.npXP);
-		final NumberPicker npHP = (NumberPicker) myView.findViewById(R.id.npHP);
-
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				dailyItems.add(new DailyItem(itemName, npXP.getValue(), npHP
-						.getValue(), MainActivity.this));
-				aaDailyAdpt.notifyDataSetChanged();
-			}
-		});
-		builder.setNegativeButton("Cancel",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						// User cancelled the dialog
-					}
-				});
-		builder.setView(myView);
-		builder.setTitle(itemName);
-		AlertDialog dialog = builder.create();
-		dialog.show();
-	}
-
-	public void newHabitDialog(final String itemName) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		LayoutInflater inflater = getLayoutInflater();
-		View myView = null;
-		myView = inflater.inflate(R.layout.daily_popup, null);
-
-		final NumberPicker npXP = (NumberPicker) myView.findViewById(R.id.npXP);
-		final NumberPicker npHP = (NumberPicker) myView.findViewById(R.id.npHP);
-
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				habitItems.add(new HabitItem(itemName, npXP.getValue(), npHP
-						.getValue(), MainActivity.this));
-				aaHabitAdpt.notifyDataSetChanged();
-			}
-		});
-		builder.setNegativeButton("Cancel",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						// User cancelled the dialog
-					}
-				});
-		builder.setView(myView);
-		builder.setTitle(itemName);
-		AlertDialog dialog = builder.create();
-		dialog.show();
-	}
-
-	public void newTodoDialog(final String itemName) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		LayoutInflater inflater = getLayoutInflater();
-		View myView = null;
-		myView = inflater.inflate(R.layout.todo_popup, null);
-
+		View myView = inflater.inflate(R.layout.daily_popup, null);
 		final NumberPicker npXP = (NumberPicker) myView.findViewById(R.id.npXP);
 		final NumberPicker npHP = (NumberPicker) myView.findViewById(R.id.npHP);
 		final NumberPicker npDue = (NumberPicker) myView
@@ -457,24 +378,43 @@ public class MainActivity extends FragmentActivity implements
 
 		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
-				todoItems.add(new TodoItem(itemName, npXP.getValue(), npHP
-						.getValue(), npDue.getValue(), MainActivity.this));
-				aaTodoAdpt.notifyDataSetChanged();
+				switch (getItemType()) {
+				case DAILY:
+					dailyItems.add(new DailyItem(name, npXP.getValue(), npHP
+							.getValue(), MainActivity.this));
+					break;
+				case HABIT:
+					habitItems.add(new HabitItem(name, npXP.getValue(), npHP
+							.getValue(), MainActivity.this));
+					break;
+				case TODO:
+					todoItems.add(new TodoItem(name, npXP.getValue(), npHP
+							.getValue(), npDue.getValue(), MainActivity.this));
+				}
+
 			}
 		});
-		builder.setNegativeButton("Cancel",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						// Do nothing
-					}
-				});
+		builder.setNegativeButton("Cancel", null);
 		builder.setView(myView);
-		builder.setTitle(itemName);
-		AlertDialog dialog = builder.create();
-		dialog.show();
+		builder.setTitle(name);
+		builder.create().show();
 	}
 
+	private int getItemType() {
+		return actionBar.getSelectedNavigationIndex();
+	}
 
+	private ItemAdapter getListFromType(int type) {
+		switch (type) {
+		case DAILY:
+			return dailyItems;
+		case HABIT:
+			return habitItems;
+		case TODO:
+			return todoItems;
+		}
+		return null;
+	}
 
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -494,27 +434,84 @@ public class MainActivity extends FragmentActivity implements
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
 
 	public boolean onOptionsItemSelected(MenuItem item) {
+		ItemAdapter items = null;
+		switch (actionBar.getSelectedNavigationIndex()) {
+		case DAILY:
+			items = dailyItems;
+			break;
+		case HABIT:
+			items = habitItems;
+			break;
+		case TODO:
+			items = todoItems;
+			break;
+		}
+		boolean shouldSort = false;
 		switch (item.getItemId()) {
 		case (R.id.menu_settings):
 			Intent intent = new Intent();
 			intent.setClass(MainActivity.this, PreferenceActivity.class);
 			startActivityForResult(intent, SETTINGS_REQUEST_CODE);
 			break;
+		case R.id.menuSortAlpha:
+			sortType = ItemAdapter.ALPHA;
+			shouldSort = true;
+			break;
+		case R.id.menuSortByCreated:
+			sortType = ItemAdapter.CREATED;
+			shouldSort = true;
+			break;
+		case R.id.menuSortByDueDate:
+			sortType = ItemAdapter.DUE_DATE;
+			shouldSort = true;
+			break;
+		case R.id.menuSortByHP:
+			sortType = ItemAdapter.HP_PEN;
+			shouldSort = true;
+			break;
+		case R.id.menuSortByLastCompleted:
+			sortType = ItemAdapter.LAST_COMPLETED;
+			shouldSort = true;
+			break;
+		case R.id.menuSortByXP:
+			sortType = ItemAdapter.XP_REW;
+			shouldSort = true;
+			break;
+		}
+		if (shouldSort) {
+			checkDirection(sortType);
+			items.sort(sortType, direction);
+			lastSort = sortType;
+			if (direction) {
+				System.out.println(String.format(
+						"SortType: %d  -  LastSort: %d  -  Direction: true",
+						sortType, lastSort));
+			} else {
+				System.out.println(String.format(
+						"SortType: %d  -  LastSort: %d  -  Direction: false",
+						sortType, lastSort));
+			}
 		}
 		return true;
+	}
+
+	private void checkDirection(int sortType) {
+		if (lastSort == sortType) {
+			direction = !direction;
+		} else {
+			direction = true;
+		}
 	}
 
 	@Override
 	public void onTabSelected(ActionBar.Tab tab,
 			FragmentTransaction fragmentTransaction) {
-		// When the given tab is selected, show the tab contents in the
-		// container view.
+		direction = false;
 		Fragment fragment = new DummySectionFragment(this);
 		Bundle args = new Bundle();
 		args.putInt(DummySectionFragment.FRAGMENT_ID, tab.getPosition());
@@ -651,29 +648,22 @@ public class MainActivity extends FragmentActivity implements
 			listViewToFill.setOnItemClickListener(mainActivity);
 			switch (itemType) {
 			case DAILY:
-				aaDailyAdpt = new ActivityItemArrayAdapter(dailyItems,
-						listviewItemLayout[itemType], getActivity());
-				listViewToFill.setAdapter(aaDailyAdpt);
-				dailySwipeList = getSwipeDismissList(aaDailyAdpt);
+				listViewToFill.setAdapter(dailyItems);
+				dailySwipeList = getSwipeDismissList(dailyItems);
 				break;
 			case HABIT:
-				aaHabitAdpt = new ActivityItemArrayAdapter(habitItems,
-						listviewItemLayout[itemType], getActivity());
-				listViewToFill.setAdapter(aaHabitAdpt);
-				habitSwipeList = getSwipeDismissList(aaHabitAdpt);
+				listViewToFill.setAdapter(habitItems);
+				habitSwipeList = getSwipeDismissList(habitItems);
 				break;
 			case TODO:
-				aaTodoAdpt = new ActivityItemArrayAdapter(todoItems,
-						listviewItemLayout[itemType], getActivity());
-				listViewToFill.setAdapter(aaTodoAdpt);
-				todoSwipeList = getSwipeDismissList(aaTodoAdpt);
+				listViewToFill.setAdapter(todoItems);
+				todoSwipeList = getSwipeDismissList(todoItems);
 				break;
 			}
 
 		}
 
-		private SwipeDismissList getSwipeDismissList(
-				final ActivityItemArrayAdapter adapter) {
+		private SwipeDismissList getSwipeDismissList(final ItemAdapter adapter) {
 			return new SwipeDismissList(listViewToFill,
 					new SwipeDismissList.OnDismissCallback() {
 						public SwipeDismissList.Undoable onDismiss(

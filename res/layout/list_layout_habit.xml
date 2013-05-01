@@ -11,8 +11,8 @@
     <LinearLayout
         android:layout_width="0dip"
         android:layout_height="wrap_content"
-        android:layout_weight="20"
         android:layout_marginRight="5sp"
+        android:layout_weight="20"
         android:gravity="center"
         android:orientation="vertical" >
 
@@ -21,7 +21,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="XP: 20"
             android:textColor="@color/green"
             android:textSize="14sp" />
 
@@ -30,19 +29,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="HP: 10"
             android:textColor="@color/red"
             android:textSize="14sp" />
     </LinearLayout>
 
     <TextView
-        android:id="@+id/tvItem"
+        android:id="@+id/tvItemName"
         android:layout_width="0dip"
         android:layout_height="wrap_content"
         android:layout_marginRight="5sp"
         android:layout_weight="50"
         android:gravity="left"
-        android:text="Testing this textview"
         android:textSize="16sp" />
 
     <Button
@@ -51,11 +48,13 @@
         android:layout_height="match_parent"
         android:layout_margin="0sp"
         android:layout_weight="15"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:minHeight="0dp"
         android:minWidth="0dp"
         android:padding="0sp"
         android:text="Up"
-        android:textSize="10sp" />
+        android:textSize="12sp" />
 
     <Button
         android:id="@+id/bDown"
@@ -63,10 +62,12 @@
         android:layout_height="match_parent"
         android:layout_margin="0sp"
         android:layout_weight="15"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:minHeight="0dp"
         android:minWidth="0dp"
         android:padding="0sp"
         android:text="Down"
-        android:textSize="10sp" />
+        android:textSize="12sp" />
 
 </LinearLayout>

@@ -77,6 +77,23 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/llSetDueDate"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:background="@drawable/list_selector_holo_light"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="4sp" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Set due date"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/llLocationAlert"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"

@@ -2,26 +2,40 @@ package com.example.lifelogging;
 
 import java.util.Date;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 public class HabitItem extends ActivityItem {
-	public String name;
-	public double xpRew, hpPen;
-	public long created, lastCompleted;
-	public boolean finished;
+	public TextView tvItemName, tvXP, tvHP;
 	private View convertView;
-	private TextView tvItemName, tvXP, tvHP;
 	private Button bUp, bDown;
 
-	public HabitItem(String name, double xpRew, double hpPen, MainActivity mainActivity) {
+	public HabitItem(String name, double xpRew, double hpPen,
+			MainActivity mainActivity) {
 		super(name, xpRew, hpPen, mainActivity);
-		this.name = name;
-		this.xpRew = xpRew;
-		this.hpPen = hpPen;
-		this.lastCompleted = this.created = new Date().getTime();
+		this.itemType = MainActivity.HABIT;
+	}
+
+	public HabitItem(String name, double xpRew, double hpPen,
+			MainActivity mainActivity, LatLng location) {
+		super(name, xpRew, hpPen, mainActivity, location);
+		this.itemType = MainActivity.HABIT;
+	}
+
+	public HabitItem(String name, double xpRew, double hpPen,
+			MainActivity mainActivity, LatLng location, int locationArea) {
+		super(name, xpRew, hpPen, mainActivity, location, locationArea);
+		this.itemType = MainActivity.HABIT;
+	}
+
+	public HabitItem(Bundle bundle) {
+		super(bundle);
 	}
 
 	@Override
@@ -33,15 +47,15 @@ public class HabitItem extends ActivityItem {
 
 	private void setupViews() {
 		getViewReferences();
-		tvXP.setText("XP: " + Double.toString(this.getXpRew()));
-		tvHP.setText("HP: " + Double.toString(this.getHpPen()));
+		tvXP.setText("XP: " + Double.toString(xpRew()));
+		tvHP.setText("HP: " + Double.toString(hpPen()));
 		bUp.setOnClickListener((OnClickListener) mainActivity);
 		bDown.setOnClickListener((OnClickListener) mainActivity);
-		tvItemName.setText(this.getName());
+		tvItemName.setText(name());
 	}
 
 	private void getViewReferences() {
-		tvItemName = (TextView) convertView.findViewById(R.id.tvItem);
+		tvItemName = (TextView) convertView.findViewById(R.id.tvItemName);
 		tvXP = (TextView) convertView.findViewById(R.id.tvItemXP);
 		tvHP = (TextView) convertView.findViewById(R.id.tvItemHP);
 		bUp = (Button) convertView.findViewById(R.id.bUp);
@@ -60,7 +74,6 @@ public class HabitItem extends ActivityItem {
 
 	@Override
 	public double update() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
